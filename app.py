@@ -113,11 +113,11 @@ video_file = st.file_uploader("Upload a video", type=["mp4", "avi", "mov"])
 # Process video if uploaded
 if video_file:
     # Create the temp_video directory if it doesn't exist
-    if not os.path.exists("temp_video"):
-        os.makedirs("temp_video")
+    #if not os.path.exists("temp_video"):
+    #    os.makedirs("temp_video")
 
     # Save uploaded file temporarily
-    temp_file_path = os.path.join("temp_video", video_file.name)
+    temp_file_path = os.path.join("", video_file.name)
     with open(temp_file_path, "wb") as f:
         f.write(video_file.getbuffer())
 
