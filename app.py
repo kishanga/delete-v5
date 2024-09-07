@@ -121,17 +121,17 @@ if video_file:
     with open(temp_file_path, "wb") as f:
         f.write(video_file.getbuffer())
 
-    st.write(f"Video saved to {temp_file_path}")
+    #st.write(f"Video saved to {temp_file_path}")
 
     # Process the video and get keypoints in DataFrame
     keypoints_df = create_df_coords(temp_file_path)
 
-    st.success("Keypoints extracted and saved to DataFrame")
+    #st.success("Keypoints extracted and saved to DataFrame")
     
     # Delete the temporary video file after predictions are made
     if os.path.exists(temp_file_path):
         os.remove(temp_file_path)
-        st.write(f"Temporary file {video_file.name} deleted.")
+        #st.write(f"Temporary file {video_file.name} deleted.")
 
     # Dropping columns containing 'person', 'nose', 'eye', or 'ear' in their names
     columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
@@ -151,5 +151,4 @@ if video_file:
     predictions = model.predict(keypoints_df)
 
     # Display the predictions
-    st.write("Predictions:")
-    st.dataframe(predictions.head())
+    st.write("Yoga form is ", predictions[0])
