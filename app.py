@@ -141,11 +141,11 @@ if video_file:
     keypoints_df.fillna(0, inplace=True)
 
     # Display the updated DataFrame
-    st.write("Processed Keypoints Data:")
-    st.dataframe(keypoints_df.head())
+    #st.write("Processed Keypoints Data:")
+    #st.dataframe(keypoints_df.head())
 
     # Make predictions using the PyCaret model
-    st.write("Making predictions...")
+    #st.write("Making predictions...")
     # Load the PyCaret model
     model = load_model('model')
     predictions = model.predict(keypoints_df)
