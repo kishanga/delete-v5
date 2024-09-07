@@ -5,3 +5,4 @@ opencv-python-headless
 pandas
 pycaret
 scikit-learn==1.4.2
+llvmlite==0.43.0
