@@ -6,7 +6,6 @@ import os
 import pandas as pd
 from collections import defaultdict
 import pickle
-import tempfile
 from pycaret.classification import load_model
 
 # Load YOLOv8 model
@@ -42,7 +41,7 @@ def create_df_coords(video_file):
     frame_index = 1
 
     # Create a VideoCapture object to open the video file
-    cap = video_file #cv2.VideoCapture(video_file)
+    cap = cv2.VideoCapture(video_file)
 
     # Loop through the video frames
     while cap.isOpened():
@@ -113,23 +112,26 @@ video_file = st.file_uploader("Upload a video", type=["mp4", "avi", "mov"])
 
 # Process video if uploaded
 if video_file:
-    
-    tfflie = tempfile.NamedTemporaryFile(delete=True)
-    tfflie.write(video_file.read())
-    vid = cv2.VideoCapture(tfflie.name)
+    # Create the temp_video directory if it doesn't exist
+    if not os.path.exists("temp_video"):
+        os.makedirs("temp_video")
 
+    # Save uploaded file temporarily
+    temp_file_path = os.path.join("temp_video", video_file.name)
+    with open(temp_file_path, "wb") as f:
+        f.write(video_file.getbuffer())
 
-    #st.write(f"Video saved to {temp_file_path}")
+    st.write(f"Video saved to {temp_file_path}")
 
     # Process the video and get keypoints in DataFrame
-    keypoints_df = create_df_coords(vid)
+    keypoints_df = create_df_coords(temp_file_path)
 
     st.success("Keypoints extracted and saved to DataFrame")
     
     # Delete the temporary video file after predictions are made
-    #if os.path.exists(temp_file_path):
-    #    os.remove(temp_file_path)
-    #    st.write(f"Temporary file {video_file.name} deleted.")
+    if os.path.exists(temp_file_path):
+        os.remove(temp_file_path)
+        st.write(f"Temporary file {video_file.name} deleted.")
 
     # Dropping columns containing 'person', 'nose', 'eye', or 'ear' in their names
     columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
@@ -151,5 +153,3 @@ if video_file:
     # Display the predictions
     st.write("Predictions:")
     st.dataframe(predictions.head())
-    
-    vid.release()
