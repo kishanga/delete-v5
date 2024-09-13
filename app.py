@@ -162,6 +162,15 @@ if video_file:
     # Reload the CSV file
     #file_path = '/mnt/data/yolo-keypoints.csv'
     #data = pd.read_csv(file_path)
+
+    # Create column names for data frame used for prediction
+    columns = []
+    for i in range(1, 31):
+        columns.append(str(i) + '_' + "person")
+    
+        for key, value in KEYPOINT_DICT.items():
+            columns.extend([str(i) + '_' + key + '_x', str(i) + '_' + key + '_y']) 
+            
     data_columns = columns
     
     # Redefine the sub_poses and matching logic
