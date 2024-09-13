@@ -204,21 +204,22 @@ if video_file:
     # Display the result
     st.write(sub_pose_column_mapping)
 
+    subpose_number = 1
 
     # Create separate CSV files for each sub-pose including the 'class' column
     for sub_pose, columns in sub_pose_column_mapping.items():
         # Include the 'class' column along with the matched columns for each sub-pose
 
         # Dropping columns containing 'person', 'nose', 'eye', or 'ear' in their names
-        columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
-        keypoints_df = keypoints_df.drop(columns=columns_to_drop)
+        #columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
+        #keypoints_df = keypoints_df.drop(columns=columns_to_drop)
         st.write(columns)
 
         # Define keywords to filter out
-        #keywords = ['person', 'nose', 'eye', 'ear']
+        keywords = ['person', 'nose', 'eye', 'ear']
         
         # Use list comprehension to filter out the items containing any of the keywords
-        #columns = [item for item in columns if not any(keyword in item for keyword in keywords)]
+        columns = [item for item in columns if not any(keyword in item for keyword in keywords)]
         
         sub_pose_data = keypoints_df[columns]
 
@@ -226,11 +227,12 @@ if video_file:
         
 
         # Load the subpose model from the pickle file
-        with open('Sub-pose_models/Sub-pose_1_model.pkl', 'rb') as file:
+        with open(f'Sub-pose_models/Sub-pose_{subpose_number}_model.pkl', 'rb') as file:
             loaded_model = pickle.load(file) 
     
-        st.write(loaded_model.predict(sub_pose_data))
-    
+        st.write(f"{sub_pose} Form: ",loaded_model.predict(sub_pose_data))
+
+        subpose_number += 1
     
     
     
