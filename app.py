@@ -213,6 +213,12 @@ if video_file:
         #columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
         #keypoints_df = keypoints_df.drop(columns=columns_to_drop)
         st.write(columns)
+
+        # Define keywords to filter out
+        keywords = ['person', 'nose', 'eye', 'ear']
+        
+        # Use list comprehension to filter out the items containing any of the keywords
+        columns = [item for item in columns if not any(keyword in item for keyword in keywords)]
         
         sub_pose_data = keypoints_df[columns]
 
