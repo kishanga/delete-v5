@@ -202,7 +202,7 @@ if video_file:
     sub_pose_column_mapping = {sub_pose: get_column_range_for_seconds(time_range) for sub_pose, time_range in sub_poses.items()}
     
     # Display the result
-    st.write(sub_pose_column_mapping)
+    #st.write(sub_pose_column_mapping)
 
     subpose_number = 1
 
