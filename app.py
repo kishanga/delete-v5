@@ -152,32 +152,6 @@ if video_file:
     #st.write("Processed Keypoints Data:")
     #st.dataframe(keypoints_df.head())
 
-    ############
-    # Create column names for data frame used for prediction
-    columns = []
-    for i in range(1, 31):
-        columns.append(str(i) + '_' + "person")
-    
-        for key, value in KEYPOINT_DICT.items():
-            columns.extend([str(i) + '_' + key + '_x', str(i) + '_' + key + '_y']) 
-
-    
-    # Find the missing columns by comparing expected with the current DataFrame columns
-    missing_columns = set(columns) - set(keypoints_df.columns)
-    st.write(missing_columns)
-    
-    # Add missing columns to the DataFrame, initialized with zero values
-    for col in missing_columns:
-        keypoints_df[col] = 0
-    
-    # Ensure the DataFrame columns are in the same order as `expected_columns`
-    keypoints_df = keypoints_df[columns]
-
-
-    ############
-
-
-
     
 
     # Make predictions using the PyCaret model
