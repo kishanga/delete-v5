@@ -153,7 +153,15 @@ if video_file:
     #st.dataframe(keypoints_df.head())
 
     ############
+    # Create column names for data frame used for prediction
+    columns = []
+    for i in range(1, 31):
+        columns.append(str(i) + '_' + "person")
+    
+        for key, value in KEYPOINT_DICT.items():
+            columns.extend([str(i) + '_' + key + '_x', str(i) + '_' + key + '_y']) 
 
+    
     # Find the missing columns by comparing expected with the current DataFrame columns
     missing_columns = set(columns) - set(keypoints_df.columns)
     
