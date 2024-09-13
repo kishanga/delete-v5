@@ -208,6 +208,11 @@ if video_file:
     # Create separate CSV files for each sub-pose including the 'class' column
     for sub_pose, columns in sub_pose_column_mapping.items():
         # Include the 'class' column along with the matched columns for each sub-pose
+
+        # Dropping columns containing 'person', 'nose', 'eye', or 'ear' in their names
+        columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
+        keypoints_df = keypoints_df.drop(columns=columns_to_drop)
+        
         sub_pose_data = keypoints_df[['class'] + columns]
         
 
