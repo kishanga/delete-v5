@@ -212,8 +212,9 @@ if video_file:
         # Dropping columns containing 'person', 'nose', 'eye', or 'ear' in their names
         columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
         keypoints_df = keypoints_df.drop(columns=columns_to_drop)
-        
-        sub_pose_data = keypoints_df
+
+        sub_pose_data = keypoints_df[columns]
+
         st.write(sub_pose_data)
         
 
