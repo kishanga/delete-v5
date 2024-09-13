@@ -213,7 +213,7 @@ if video_file:
         # Dropping columns containing 'person', 'nose', 'eye', or 'ear' in their names
         #columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
         #keypoints_df = keypoints_df.drop(columns=columns_to_drop)
-        st.write(columns)
+        #st.write(columns)
 
         # Define keywords to filter out
         keywords = ['person', 'nose', 'eye', 'ear']
@@ -223,14 +223,14 @@ if video_file:
         
         sub_pose_data = keypoints_df[columns]
 
-        st.write(sub_pose_data)
+        #st.write(sub_pose_data)
         
 
         # Load the subpose model from the pickle file
         with open(f'Sub-pose_models/Sub-pose_{subpose_number}_model.pkl', 'rb') as file:
             loaded_model = pickle.load(file) 
     
-        st.write(f"{sub_pose} Form: ",loaded_model.predict(sub_pose_data))
+        st.write(f"{sub_pose} Form: ",loaded_model.predict(sub_pose_data)[0])
 
         subpose_number += 1
     
