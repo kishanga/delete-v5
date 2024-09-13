@@ -13,49 +13,62 @@ yolo_model = YOLO("yolov8m-pose.pt")
 
 # Prepare the keypoints' names and indices
 KEYPOINT_DICT = {
-'nose': 0,
-'left_eye': 1,
-'right_eye': 2,
-'left_ear': 3,
-'right_ear': 4,
-'left_shoulder': 5,
-'right_shoulder': 6,
-'left_elbow': 7,
-'right_elbow': 8,
-'left_wrist': 9,
-'right_wrist': 10,
-'left_hip': 11,
-'right_hip': 12,
-'left_knee': 13,
-'right_knee': 14,
-'left_ankle': 15,
-'right_ankle': 16
+    'nose': 0,
+    'left_eye': 1,
+    'right_eye': 2,
+    'left_ear': 3,
+    'right_ear': 4,
+    'left_shoulder': 5,
+    'right_shoulder': 6,
+    'left_elbow': 7,
+    'right_elbow': 8,
+    'left_wrist': 9,
+    'right_wrist': 10,
+    'left_hip': 11,
+    'right_hip': 12,
+    'left_knee': 13,
+    'right_knee': 14,
+    'left_ankle': 15,
+    'right_ankle': 16
 }
+
+# Sub-pose ranges in seconds
+SUB_POSES = {
+    'Sub-pose 1': (0, 3),
+    'Sub-pose 2': (3, 8),
+    'Sub-pose 3': (8, 12),
+    'Sub-pose 4': (12, 22),
+    'Sub-pose 5': (22, 30),
+    'Sub-pose 6': (30, 35),
+    'Sub-pose 7': (35, 37),
+    'Sub-pose 8': (37, 40),
+    'Sub-pose 9': (40, 46),
+    'Sub-pose 10': (46, 50),
+    'Sub-pose 11': (50, 55),
+    'Sub-pose 12': (55, 60)
+}
+
+# Function to map frame index to sub-pose
+def get_sub_pose(frame_index):
+    seconds = (frame_index / 30)  # Assuming 30 fps
+    for sub_pose, (start, end) in SUB_POSES.items():
+        if start <= seconds < end:
+            return sub_pose
+    return None
 
 # Function for processing video and returning keypoints in a Pandas DataFrame
 def create_df_coords(video_file):
-    # Initialise list to store keypoints of all frames
     rows_list = []
-
-    # Set frame index for tracking frame number
     frame_index = 1
-
-    # Create a VideoCapture object to open the video file
     cap = cv2.VideoCapture(video_file)
 
-    # Loop through the video frames
     while cap.isOpened():
         success, frame = cap.read()
-
         if success:
-            # Extract the landmarks for every 60 frames i.e. 2 seconds
             if frame_index % 60 == 0 and frame_index <= 1800:
                 results = yolo_model.track(frame, conf=0.5, stream=True)
-
-                # Store the track history
                 track_history = defaultdict(lambda: [])
 
-                # process through results generator
                 for r in results:
                     boxes = r[0].boxes.xywh.cpu()
                     track_ids = r[0].boxes.id.int().cpu().tolist()
@@ -67,88 +80,56 @@ def create_df_coords(video_file):
                         if len(track) > 30:
                             track.pop(0)
 
-                    # retrieve keypoints, add keypoints to df
                     row = r.keypoints.xyn.cpu().numpy()[0].flatten().tolist()
                     row.insert(0, track_id)
-
-                    # append row to rows_list
+                    row.append(get_sub_pose(frame_index))  # Append sub-pose
                     rows_list.append(row)
         else:
             break
-
         frame_index += 1
-      
     
-    
-    
-    
-    # Create column names for data frame used for prediction
-    columns = []
+    columns = ['track_id']
     for i in range(1, 31):
-        columns.append(str(i) + '_' + "person")
-    
-        for key, value in KEYPOINT_DICT.items():
-            columns.extend([str(i) + '_' + key + '_x', str(i) + '_' + key + '_y']) 
-                       
-    # Flatten rows_list
-    flattened_rows_list = [item for sublist in rows_list for item in sublist]
-    
-    # Convert to DataFrame with a single row
-    keypoints_df = pd.DataFrame([flattened_rows_list], columns=columns)
+        columns.append(f'{i}_person')
+        for key, _ in KEYPOINT_DICT.items():
+            columns.extend([f'{i}_{key}_x', f'{i}_{key}_y'])
+    columns.append('sub_pose')  # Add sub-pose column
 
-    # Release the video capture object and close the display window
+    keypoints_df = pd.DataFrame(rows_list, columns=columns)
     cap.release()
     cv2.destroyAllWindows()
 
     return keypoints_df
 
-
-
 # Streamlit app
-st.title("Video Upload, Keypoints Extraction, and Prediction App")
+st.title("Video Upload, Keypoints Extraction, and Sub-Pose Display App")
 
 # Video upload
 video_file = st.file_uploader("Upload a video", type=["mp4", "avi", "mov"])
 
-# Process video if uploaded
 if video_file:
-    # Create the temp_video directory if it doesn't exist
-    #if not os.path.exists("temp_video"):
-    #    os.makedirs("temp_video")
-
-    # Save uploaded file temporarily
     temp_file_path = os.path.join("", video_file.name)
     with open(temp_file_path, "wb") as f:
         f.write(video_file.getbuffer())
 
-    #st.write(f"Video saved to {temp_file_path}")
-
     # Process the video and get keypoints in DataFrame
     keypoints_df = create_df_coords(temp_file_path)
 
-    #st.success("Keypoints extracted and saved to DataFrame")
-    
-    # Delete the temporary video file after predictions are made
+    # Remove the temporary video file
     if os.path.exists(temp_file_path):
         os.remove(temp_file_path)
-        #st.write(f"Temporary file {video_file.name} deleted.")
 
-    # Dropping columns containing 'person', 'nose', 'eye', or 'ear' in their names
+    # Drop columns containing 'person', 'nose', 'eye', or 'ear'
     columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
     keypoints_df = keypoints_df.drop(columns=columns_to_drop)
-
-    # Fill the missing keypoints with 0 due to lack of frames in some videos
     keypoints_df.fillna(0, inplace=True)
 
-    # Display the updated DataFrame
-    #st.write("Processed Keypoints Data:")
-    #st.dataframe(keypoints_df.head())
+    # Display the DataFrame with sub-poses
+    st.write("Processed Keypoints with Sub-Poses:")
+    st.dataframe(keypoints_df)
 
     # Make predictions using the PyCaret model
-    #st.write("Making predictions...")
-    # Load the PyCaret model
     model = load_model('model')
     predictions = model.predict(keypoints_df)
 
-    # Display the predictions
-    st.write("Yoga form is ", predictions[0])
+    st.write("Predicted Yoga Form:", predictions[0])
