@@ -164,6 +164,7 @@ if video_file:
     
     # Find the missing columns by comparing expected with the current DataFrame columns
     missing_columns = set(columns) - set(keypoints_df.columns)
+    st.write(missing_columns)
     
     # Add missing columns to the DataFrame, initialized with zero values
     for col in missing_columns:
