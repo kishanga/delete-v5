@@ -205,13 +205,17 @@ if video_file:
     st.write(sub_pose_column_mapping)
 
 
+    # Create separate CSV files for each sub-pose including the 'class' column
+    for sub_pose, columns in sub_pose_column_mapping.items():
+        # Include the 'class' column along with the matched columns for each sub-pose
+        sub_pose_data = keypoints_df[['class'] + columns]
+        
 
-
-    # Load the subpose model from the pickle file
-    with open('Sub-pose_models/Sub-pose_1_model.pkl', 'rb') as file:
-        loaded_model = pickle.load(file) 
-
-    st.write(loaded_model.predict(new_data))
+        # Load the subpose model from the pickle file
+        with open('Sub-pose_models/Sub-pose_1_model.pkl', 'rb') as file:
+            loaded_model = pickle.load(file) 
+    
+        st.write(loaded_model.predict(sub_pose_data))
     
     
     
