@@ -8,6 +8,10 @@ from collections import defaultdict
 import pickle
 from pycaret.classification import load_model
 
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+import pickle
+
 # Load YOLOv8 model
 yolo_model = YOLO("yolov8m-pose.pt") 
 
@@ -152,3 +156,55 @@ if video_file:
 
     # Display the predictions
     st.write("Yoga form is ", predictions[0])
+
+    ######### Sub-poses
+        
+    # Reload the CSV file
+    #file_path = '/mnt/data/yolo-keypoints.csv'
+    #data = pd.read_csv(file_path)
+    data_columns = columns
+    
+    # Redefine the sub_poses and matching logic
+    sub_poses = {
+        'Sub-pose 1': (0, 3),
+        'Sub-pose 2': (3, 8),
+        'Sub-pose 3': (8, 12),
+        'Sub-pose 4': (12, 22),
+        'Sub-pose 5': (22, 30),
+        'Sub-pose 6': (30, 35),
+        'Sub-pose 7': (35, 37),
+        'Sub-pose 8': (37, 40),
+        'Sub-pose 09': (40, 46),
+        'Sub-pose10': (46, 50),
+        'Sub-pose 11': (50, 55),
+        'Sub-pose 12': (55, 60)
+    }
+    
+    def get_column_range_for_seconds(sub_pose_range):
+        start_second, end_second = sub_pose_range
+        columns = []
+        for second in range(start_second, end_second + 1, 2):  # Step every 2 seconds
+            column_prefix = f'{(second // 2) + 1}_'  # 2 seconds interval correspond to 1_, 2_, etc.
+            matched_columns = [col for col in data_columns if col.startswith(column_prefix)]
+            columns.extend(matched_columns)
+        return columns
+    
+    # Create a dictionary mapping each sub-pose to its corresponding columns
+    sub_pose_column_mapping = {sub_pose: get_column_range_for_seconds(time_range) for sub_pose, time_range in sub_poses.items()}
+    
+    # Display the result
+    st.write(sub_pose_column_mapping)
+
+
+
+
+    # Load the subpose model from the pickle file
+    with open('Sub-pose_models/Sub-pose_1_model.pkl', 'rb') as file:
+        loaded_model = pickle.load(file) 
+
+    st.write(loaded_model.predict(new_data))
+    
+    
+    
+    
+    
