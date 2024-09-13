@@ -100,20 +100,6 @@ def create_df_coords(video_file):
     # Convert to DataFrame with a single row
     keypoints_df = pd.DataFrame([flattened_rows_list], columns=columns)
 
-    ############
-
-    # Find the missing columns by comparing expected with the current DataFrame columns
-    missing_columns = set(columns) - set(keypoints_df.columns)
-    
-    # Add missing columns to the DataFrame, initialized with zero values
-    for col in missing_columns:
-        keypoints_df[col] = 0
-    
-    # Ensure the DataFrame columns are in the same order as `expected_columns`
-    keypoints_df = keypoints_df[columns]
-
-
-    ############
 
 
     
@@ -165,6 +151,25 @@ if video_file:
     # Display the updated DataFrame
     #st.write("Processed Keypoints Data:")
     #st.dataframe(keypoints_df.head())
+
+    ############
+
+    # Find the missing columns by comparing expected with the current DataFrame columns
+    missing_columns = set(columns) - set(keypoints_df.columns)
+    
+    # Add missing columns to the DataFrame, initialized with zero values
+    for col in missing_columns:
+        keypoints_df[col] = 0
+    
+    # Ensure the DataFrame columns are in the same order as `expected_columns`
+    keypoints_df = keypoints_df[columns]
+
+
+    ############
+
+
+
+    
 
     # Make predictions using the PyCaret model
     #st.write("Making predictions...")
