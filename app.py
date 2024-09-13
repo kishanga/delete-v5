@@ -210,15 +210,15 @@ if video_file:
         # Include the 'class' column along with the matched columns for each sub-pose
 
         # Dropping columns containing 'person', 'nose', 'eye', or 'ear' in their names
-        #columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
-        #keypoints_df = keypoints_df.drop(columns=columns_to_drop)
+        columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
+        keypoints_df = keypoints_df.drop(columns=columns_to_drop)
         st.write(columns)
 
         # Define keywords to filter out
-        keywords = ['person', 'nose', 'eye', 'ear']
+        #keywords = ['person', 'nose', 'eye', 'ear']
         
         # Use list comprehension to filter out the items containing any of the keywords
-        columns = [item for item in columns if not any(keyword in item for keyword in keywords)]
+        #columns = [item for item in columns if not any(keyword in item for keyword in keywords)]
         
         sub_pose_data = keypoints_df[columns]
 
