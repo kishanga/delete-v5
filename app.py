@@ -213,7 +213,8 @@ if video_file:
         columns_to_drop = keypoints_df.filter(regex='person|nose|eye|ear').columns
         keypoints_df = keypoints_df.drop(columns=columns_to_drop)
         
-        sub_pose_data = keypoints_df[['class'] + columns]
+        sub_pose_data = keypoints_df
+        st.write(sub_pose_data)
         
 
         # Load the subpose model from the pickle file
