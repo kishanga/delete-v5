@@ -109,7 +109,7 @@ def create_df_coords(video_file):
 
 
 # Streamlit app
-st.title("Video Upload, Keypoints Extraction, and Prediction App")
+st.title("Subpose Detection")
 
 # Video upload
 video_file = st.file_uploader("Upload a video", type=["mp4", "avi", "mov"])
